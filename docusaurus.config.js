@@ -6,13 +6,13 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 (module.exports = {
   title: "Safan's Notes",
   tagline: 'A Collections of My Notes',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://karim1safan.github.io',
+  baseUrl: '/mynotes/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'karim1safan', // Usually your GitHub org/user name.
-  projectName: 'csnotes', // Usually your repo name.
+  projectName: 'mynotes', // Usually your repo name.
 
   presets: [
     [

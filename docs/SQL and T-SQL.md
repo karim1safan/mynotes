@@ -210,8 +210,10 @@ FROM Production.Product;
 ```
 
 ## Handle NULLs
-A NULL value means _no value_ or _unknown_. 
-It does not mean zero or blank, or even an empty string. Those values are not unknown.
+A NULL value means _no value_ or _unknown_.
+* It isn't equal to anything, and it’s not unequal to anything.
+* It does not mean zero or blank, or even an empty string. 
+* Those values are not unknown.
 A NULL value can be used for values that haven’t been supplied yet.
 As you've seen previously, a NULL value can also be returned by some conversion functions if a value is not compatible with the target data type `TRY_CAST` and `TRY_PARSE`.
 
