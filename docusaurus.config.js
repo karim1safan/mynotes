@@ -8,11 +8,11 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   tagline: 'A Collections of My Notes',
   url: 'https://karim1safan.github.io',
   baseUrl: '/mynotes/',
+  organizationName: 'karim1safan', // Usually your GitHub org/user name.
+  projectName: 'mynotes', // Usually your repo name.
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'karim1safan', // Usually your GitHub org/user name.
-  projectName: 'mynotes', // Usually your repo name.
 
   presets: [
     [
@@ -54,7 +54,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             label: 'Notes',
           },
           {
-            href: 'https://github.com/karim1safan',
+            href: 'https://github.com/karim1safan/',
             label: 'GitHub',
             position: 'right',
           },

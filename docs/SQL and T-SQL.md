@@ -136,7 +136,7 @@ CAST to convert the integer values in the ProductID column to varchar values (wi
 
 CAST is the ANSI standard SQL function for converting between data types, and is used in many database systems.
 
-_Syntax_: `CAST(col_name AS data_type)`
+**_Syntax_**: `CAST(col_name AS data_type)`
 
 ```sql
 SELECT CAST(ProductID AS varchar(4)) + ': ' + Name AS ProductName
@@ -155,7 +155,7 @@ FROM Production.Product;
 Given that at least some of the values in the column are numeric, you might want to convert those values and ignore the others. 
 You can use the `TRY_CAST` function to convert data types.
 
-_Syntax_: `TRY_CAST(col_name AS data_type)`
+**_Syntax_**: `TRY_CAST(col_name AS data_type)`
 
 ```sql
 SELECT TRY_CAST(Size AS integer) As NumericSize
@@ -166,7 +166,7 @@ The values that can be converted to a numeric data type are returned as _decimal
 
 2. `CONVERT` and `TRY_CONVERT`
 
-_Syntax_: `CONVERT(data_type, col_name)`
+**_Syntax_**: `CONVERT(data_type, col_name)`
 
 In Transact-SQL, you can also use the CONVERT function, as shown here:
 ```sql
@@ -190,7 +190,7 @@ FROM SalesLT.Product;
 The PARSE function is designed to convert formatted strings that represent numeric or date/time values.
 For example, consider the following query (which uses literal values rather than values from columns in a table):
 
-_Syntax_: `PARSE(string_type AS datat_type`
+**_Syntax_**: `PARSE(string_type AS datat_type`
 
 ```sql
 SELECT PARSE('01/01/2021' AS date) AS DateValue,
@@ -203,7 +203,7 @@ SELECT PARSE('01/01/2021' AS date) AS DateValue,
 
 4. `STR`: The STR function converts a numeric value to a _varchar_.
 
-_Syntax_: `STR(numeric_value)`
+**_Syntax_**: `STR(numeric_value)`
 ```sql
 SELECT ProductID,  '$' + STR(ListPrice) AS Price
 FROM Production.Product;
@@ -213,10 +213,136 @@ FROM Production.Product;
 A NULL value means _no value_ or _unknown_.
 * It isn't equal to anything, and it’s not unequal to anything.
 * It does not mean zero or blank, or even an empty string. 
+* NULL isn't greater or less than anything.
 * Those values are not unknown.
+
 A NULL value can be used for values that haven’t been supplied yet.
 As you've seen previously, a NULL value can also be returned by some conversion functions if a value is not compatible with the target data type `TRY_CAST` and `TRY_PARSE`.
+We can’t say anything about what it is, but sometimes we need to work with NULL values.
 
+T-SQL provides functions for conversion or replacement of NULL values.
+1. `ISNULL`: takes two arguments. The first is an expression we are testing.
 
+**_Syntax_**: `ISNULL(expression/col, replaced_val)` If the value of that first argument is NULL, the function returns the second argument.
+If the first expression is not null, it is returned unchanged.
 
+```sql
+SELECT FirstName,
+      ISNULL(MiddleName, 'None') AS MiddleIfAny,
+      LastName
+FROM Sales.Customer;
+```
 
+**_NOTE:_** The value substituted for NULL must be the same datatype as the expression being evaluated.
+
+2. `COALESCE`: The `ISNULL` function is not ANSI standard, so you may wish to use the `COALESCE` function instead.
+`COALESCE` is a little more flexible in that it **can take a variable number of arguments**, each of which is an expression.
+**It will return the first expression in the list that is not** `NULL`.
+
+**If there are only two arguments**, `COALESCE` behaves like `ISNULL`.
+However, with **more than two arguments**, `COALESCE` can be used as an alternative to a multipart CASE expression using `ISNULL`.
+
+If all arguments are NULL, COALESCE returns NULL.
+All the expressions must return the same or compatible data types.
+
+**_Syntax_**: `COALESCE(value1, value2, value3, ...)`
+
+Replace `NULL` by 'Default Value'
+```sql
+SELECT COALESCE(NULL, 'Default Value');
+```
+
+If the phone column is NULL replace the NULL value by 'No Phone'
+```sql
+SELECT name, COALESCE(phone, 'No Phone') AS phone_number
+FROM users;
+```
+
+The _email_ will be returned if it is not NULL.
+If it is NULL, the _phone_ will be returned.
+If both are NULL, 'No Contact' will be returned.  
+```sql
+SELECT COALESCE(email, phone, 'No Contact') AS contact_info
+FROM users;
+```
+
+The difference between `COALESCE` and `ISNULL`:
+- `COALESCE` can handle multiple values, while `ISNULL` accepts only a single replacement value.
+- `COALESCE` stops at the first non-NULL value, whereas `ISNULL` replaces `NULL` with a single specified value.
+
+3. `NULLIF`: function allows you to return `NULL` under certain conditions.
+This function has useful applications in areas such as data cleansing when you wish to replace blank or placeholder characters with NULL.
+
+`NULLIF` takes two arguments and returns `NULL` if they're equivalent. If they aren't equal, `NULLIF` returns the first argument.
+
+In this example, NULLIF replaces a discount of 0 with a NULL. It returns the discount value if it is not 0:
+```sql
+SELECT SalesOrderID,
+      ProductID,
+      UnitPrice,
+      NULLIF(UnitPriceDiscount, 0) AS Discount
+FROM Sales.SalesOrderDetail;
+```
+---
+## Sort and Filter results in T-SQL
+To tell SQL Server to return the results of your query in a particular order, you add an `ORDER BY` clause in this form:
+
+```sql
+SELECT<select_list>
+FROM <table_source>
+ORDER BY <order_by_list> [ASC|DESC];
+```
+
+`ORDER BY` can take several types of elements in its list:
+- column by name: we can specify the column by name 
+- column aliases: we can use the alias name of the column name.
+- columns by ordinal position in the `SELECT` list
+  - Using the position isn't recommended in your applications.
+    - if the order of columns change in `SELECT` clause gave me an expected results.
+```sql
+    SELECT id, name, age
+    FROM users
+    ORDER BY 3 DESC;
+```
+- columns not included in the SELECT list, but available from tables
+```sql
+  SELECT id, name
+  FROM users
+  ORDER BY age DESC;
+``` 
+If the query uses a `DISTINCT` option, any columns in the `ORDER BY` list must be included in the SELECT list.
+This gives me an error because the _age_ column doesn't exist in `SELECT` clause.
+```sql
+SELECT DISTINCT id, name 
+FROM users
+ORDER BY age DESC;
+```
+
+You may also control the direction of the sort:
+1. `ASC` for ascending [A-Z, 0-9].
+2. `DESC` for descending [Z-A, 9-0].
+
+```sql
+SELECT ProductCategoryID AS Category, ProductName
+FROM Production.Product
+ORDER BY Category ASC, Price DESC;
+```
+
+### Using the `TOP` clause
+`TOP` will let you specify how many rows to return, either as a positive integer or as a percentage of all qualifying rows.
+`TOP` is most frequently used with an `ORDER BY`, but can be used with unordered data.
+
+```sql
+SELECT TOP (N) <column_list>
+FROM <table_source>
+WHERE <search_condition>
+ORDER BY <order list> [ASC|DESC];
+```
+
+For example, to retrieve only the 10 most expensive products from the Production.Product table, use the following query:
+
+```sql
+SELECT TOP 10 Name, ListPrice
+FROM Production.Product
+ORDER BY ListPrice DESC;
+```
