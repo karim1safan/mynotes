@@ -8,7 +8,7 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "GIT_USER=karim1safan npm run deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
